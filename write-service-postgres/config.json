@@ -1,0 +1,14 @@
+{
+  "name": "Write Service Postgres",
+  "profile": "debug",
+  "version": "v6.1.1",
+  "port":"8081",
+  "postgres.host": "localhost",
+  "postgres.username": "postgres",
+  "postgres.password": "",
+  "postgres.database": "orm_test",
+  "postgres.port": "5432",
+  "rabbitmq.host": "localhost",
+  "rabbitmq.username": "guest",
+  "rabbitmq.password": "guest"
+}

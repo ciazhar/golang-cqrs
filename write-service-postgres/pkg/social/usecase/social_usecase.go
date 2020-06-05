@@ -2,12 +2,14 @@ package usecase
 
 import (
 	"errors"
+	"github.com/ciazhar/golang-cqrs/common"
 	"github.com/ciazhar/golang-cqrs/common/logger"
 	"github.com/ciazhar/golang-cqrs/common/validator"
 	"github.com/ciazhar/golang-cqrs/write-service-postgres/app"
 	"github.com/ciazhar/golang-cqrs/write-service-postgres/pkg/social/model"
 	"github.com/ciazhar/golang-cqrs/write-service-postgres/pkg/social/repository/postgres"
 	"github.com/imdario/mergo"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
@@ -20,6 +22,8 @@ type SocialUseCase interface {
 type socialUseCase struct {
 	Application      *app.Application
 	SocialRepository postgres.SocialPostgresRepository
+	StorePublisher   common.Publisher
+	UpdatePublisher  common.Publisher
 }
 
 func (c socialUseCase) Update(req *model.Social) error {
@@ -39,7 +43,15 @@ func (c socialUseCase) Update(req *model.Social) error {
 	req.UpdatedAt = time.Now()
 	req.DeletedAt = oldReq.DeletedAt
 
-	return c.SocialRepository.Update(req)
+	if err := c.SocialRepository.Update(req); err != nil {
+		return logger.WithError(err)
+	}
+
+	if err := c.UpdatePublisher.Publish(req, uuid.NewV1().String()); err != nil {
+		return logger.WithError(err)
+	}
+
+	return nil
 }
 
 func (c socialUseCase) Delete(id string) error {
@@ -47,11 +59,21 @@ func (c socialUseCase) Delete(id string) error {
 	if err != nil {
 		return logger.WithError(err)
 	}
+
 	if !payload.DeletedAt.IsZero() {
 		return logger.WithError(errors.New("not found"))
 	}
 	payload.DeletedAt = time.Now()
-	return c.SocialRepository.Update(&payload)
+
+	if err := c.SocialRepository.Update(&payload); err != nil {
+		return logger.WithError(err)
+	}
+
+	if err := c.UpdatePublisher.Publish(payload, uuid.NewV1().String()); err != nil {
+		return logger.WithError(err)
+	}
+
+	return nil
 }
 
 func (c socialUseCase) Store(req *model.Social) error {
@@ -61,20 +83,34 @@ func (c socialUseCase) Store(req *model.Social) error {
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
 
-	publisher, err := c.Application.RabbitMQBroker.CreatePublisher("testing")
-	if err != nil {
-		return logger.WithError(err)
-	}
-	if err := publisher.Publish(req, req.Id); err != nil {
+	if err := c.SocialRepository.Store(req); err != nil {
 		return logger.WithError(err)
 	}
 
-	return c.SocialRepository.Store(req)
+	if err := c.StorePublisher.Publish(req, uuid.NewV1().String()); err != nil {
+		return logger.WithError(err)
+	}
+
+	return nil
 }
 
-func NewSocialUseCase(application *app.Application, socialRepository postgres.SocialPostgresRepository) SocialUseCase {
+func NewSocialUseCase(application *app.Application, socialRepository postgres.SocialPostgresRepository) (SocialUseCase, error) {
+	r := socialUseCase{}
+
+	storePublisher, err := application.RabbitMQBroker.CreatePublisher("social_store")
+	if err != nil {
+		return r, logger.WithError(err)
+	}
+
+	updatePublisher, err := application.RabbitMQBroker.CreatePublisher("social_update")
+	if err != nil {
+		return r, logger.WithError(err)
+	}
+
 	return socialUseCase{
 		Application:      application,
 		SocialRepository: socialRepository,
-	}
+		StorePublisher:   storePublisher,
+		UpdatePublisher:  updatePublisher,
+	}, nil
 }

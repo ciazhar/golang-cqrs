@@ -11,15 +11,22 @@ import (
 
 func main() {
 
-	//setup
+	//setup app
 	application, err := app.SetupApp()
 	if err != nil {
 		panic(err)
 	}
 
+	//setup http
+	if err := InitHTTP(application); err != nil {
+		panic(err)
+	}
+}
+
+func InitHTTP(application *app.Application) error {
 	//config router api
 	router := gin.New()
-	social.New(router, "/social", application)
+	social.InitHTTP(router, "/social", application)
 
 	//middleware
 	router.Use(gin.Recovery())
@@ -28,7 +35,5 @@ func main() {
 
 	//run
 	log.Info().Caller().Msg("Running in port : " + application.Env.Get("port"))
-	if err := router.Run(":" + application.Env.Get("port")); err != nil {
-		panic(err.Error())
-	}
+	return router.Run(":" + application.Env.Get("port"))
 }

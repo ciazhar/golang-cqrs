@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func New(engine *gin.Engine, routes string, app *app.Application) {
+func InitHTTP(engine *gin.Engine, routes string, app *app.Application) {
 	repo := postgres.NewSocialPostgresRepository(app)
 	uc := usecase.NewSocialUseCase(app, repo)
 	controller := rest.NewSocialController(uc)

@@ -4,6 +4,9 @@ MOCK=./domain
 run:
 	go run main.go
 
+run-grpc:
+	go run main-grpc.go
+
 test:
 	go test ./...
 

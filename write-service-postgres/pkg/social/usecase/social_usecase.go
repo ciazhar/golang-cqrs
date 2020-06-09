@@ -94,17 +94,15 @@ func (c socialUseCase) Store(req *model.Social) error {
 	return nil
 }
 
-func NewSocialUseCase(application *app.Application, socialRepository postgres.SocialPostgresRepository) (SocialUseCase, error) {
-	r := socialUseCase{}
-
+func NewSocialUseCase(application *app.Application, socialRepository postgres.SocialPostgresRepository) SocialUseCase {
 	storePublisher, err := application.RabbitMQBroker.CreatePublisher("social_store")
 	if err != nil {
-		return r, logger.WithError(err)
+		panic(err)
 	}
 
 	updatePublisher, err := application.RabbitMQBroker.CreatePublisher("social_update")
 	if err != nil {
-		return r, logger.WithError(err)
+		panic(err)
 	}
 
 	return socialUseCase{
@@ -112,5 +110,5 @@ func NewSocialUseCase(application *app.Application, socialRepository postgres.So
 		SocialRepository: socialRepository,
 		StorePublisher:   storePublisher,
 		UpdatePublisher:  updatePublisher,
-	}, nil
+	}
 }

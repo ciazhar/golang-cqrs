@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "api";
+
+message socialRequest {
+  string id = 1;
+}
+
+message socialResponse {
+  string id = 1;
+  string name = 2;
+  string detail = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
+  string deletedAt = 6;
+}
+
+service socialService {
+  rpc GetByID(socialRequest) returns (socialResponse) {};
+}

@@ -8,5 +8,5 @@
   "postgres.password": "",
   "postgres.database": "orm_test",
   "postgres.port": "5432",
-  "organization.service.url": "http://localhost:8082"
+  "grpc.address": "0.0.0.0:50051"
 }

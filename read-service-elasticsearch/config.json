@@ -1,0 +1,12 @@
+{
+  "name": "Read Service Elasticsearch",
+  "profile": "debug",
+  "version": "v6.1.1",
+  "port":"8080",
+  "postgres.host": "localhost",
+  "postgres.username": "postgres",
+  "postgres.password": "",
+  "postgres.database": "orm_test",
+  "postgres.port": "5432",
+  "organization.service.url": "http://localhost:8082"
+}

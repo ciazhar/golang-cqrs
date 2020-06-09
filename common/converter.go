@@ -10,7 +10,7 @@ import (
 
 func ToStruct(filename string, obj interface{}) {
 	_, b, _, _ := runtime.Caller(0)
-	basepath := filepath.Dir(b)
+	basepath := filepath.Clean(filepath.Join(filepath.Dir(b), ".."))
 
 	expected, _ := ioutil.ReadFile(basepath + "/" + filename)
 

@@ -25,13 +25,13 @@ func init() {
 
 func NewActual() model.Social {
 	var social model.Social
-	common.ToStruct("social/actual.1.golden", &social)
+	common.ToStruct("write-service-postgres/testdata/social/actual.1.golden", &social)
 	return social
 }
 
 func NewActual2() model.Social {
 	var social model.Social
-	common.ToStruct("social/actual.2.golden", &social)
+	common.ToStruct("write-service-postgres/testdata/social/actual.2.golden", &social)
 	return social
 }
 

@@ -32,7 +32,7 @@ var ID string
 
 func NewActual() model.Social {
 	var social model.Social
-	common.ToStruct("social/actual.1.golden", &social)
+	common.ToStruct("write-service-postgres/testdata/social/actual.1.golden", &social)
 	social.CreatedAt = time.Now()
 	social.UpdatedAt = time.Now()
 	return social
@@ -40,7 +40,7 @@ func NewActual() model.Social {
 
 func NewActual2() model.Social {
 	var social model.Social
-	common.ToStruct("social/actual.2.golden", &social)
+	common.ToStruct("write-service-postgres/testdata/social/actual.2.golden", &social)
 	social.CreatedAt = time.Now()
 	social.UpdatedAt = time.Now()
 	return social

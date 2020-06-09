@@ -25,7 +25,7 @@ func init() {
 
 func NewSocial() model.Social {
 	var social model.Social
-	common.ToStruct("social/actual.1.golden", &social)
+	common.ToStruct("write-service-postgres/testdata/social/actual.1.golden", &social)
 	repo := postgres.NewSocialPostgresRepository(Application)
 	_ = repo.Store(&social)
 	return social
